@@ -11,7 +11,6 @@ import yfinance as yf
 def transform_to_df(ticker):
     """Takes in historical data as json and returns it as a df"""
     data = yf.download(ticker, start="2022-01-01", end="2026-04-01")
-    print(data.head())
     return data
 
 
@@ -27,11 +26,11 @@ def stategy(history):
         return "SELL" 
 
 def Backtester(close, date):
+    """Takes in a series of closing prices and applies stategy to each tick"""
     cash = 100000
     shares = 0
-    equity = []
+    ma_equity = []
     dates_data = date[49:]
-    """Takes in a series of closing prices and applies stategy to each tick"""
     for i in range(49, len(close)):
         # get history up until current day
         history = close.iloc[:i+1]
@@ -49,11 +48,27 @@ def Backtester(close, date):
             cash += price * shares
             shares = 0
 
-        equity.append(cash + (shares * price))
+        ma_equity.append(cash + (shares * price))
 
-    plt.plot(dates_data, equity)
-    plt.show
+    plt.plot(dates_data, ma_equity)
 
+def Benchmark(close, date):
+    """Buy and Hold: for each day, see how much selling wouldve gotten us, then store res but never actually sell"""
+    cash = 100000
+    shares = 0
+    benchmark_equity = []
+    dates_data = date[49:]
+    bought = False
+    for i in range(49, len(close)):
+        price = close.iloc[i]
+        if not bought:
+            shares = int(cash / price)
+            cash = cash - shares * price # store left over after buying
+            bought = True
+
+        benchmark_equity.append(cash + (shares * price))
+
+    plt.plot(dates_data, benchmark_equity)
 
 
         
@@ -64,6 +79,7 @@ def run():
     close_data = data["Close"].squeeze() # turn to series
     dates_data = data.index
     Backtester(close_data,dates_data)
+    Benchmark(close_data, dates_data)
     plt.xticks(rotation=45)
     plt.show()
 
