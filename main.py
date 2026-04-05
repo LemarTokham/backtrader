@@ -50,7 +50,7 @@ def Backtester(close, date):
 
         ma_equity.append(cash + (shares * price))
 
-    plt.plot(dates_data, ma_equity)
+    plt.plot(dates_data, ma_equity, label='MA Strategy')
 
 def Benchmark(close, date):
     """Buy and Hold: for each day, see how much selling wouldve gotten us, then store res but never actually sell"""
@@ -68,7 +68,7 @@ def Benchmark(close, date):
 
         benchmark_equity.append(cash + (shares * price))
 
-    plt.plot(dates_data, benchmark_equity)
+    plt.plot(dates_data, benchmark_equity, label='Buy & Hold')
 
 
         
@@ -81,6 +81,7 @@ def run():
     Backtester(close_data,dates_data)
     Benchmark(close_data, dates_data)
     plt.xticks(rotation=45)
+    plt.legend()
     plt.show()
 
 run()
